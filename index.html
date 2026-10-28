@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="WebGIS Portal for Polpully Grama Panchayat">
+    <title>WebGIS – Polpully Grama Panchayat</title>
+
+    <!-- 1. PRECONNECT: Speeds up DNS lookups and SSL handshakes on slow networks -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+    <!-- Modern Google Fonts (Includes display=swap so text shows immediately in a system font before custom font loads) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <style>
+        /* --- Modern Aesthetic Variables --- */
+        :root {
+            /* Color Palette */
+            --primary: #0F4C5C;        /* Deep Slate Teal */
+            --primary-dark: #09303a;
+            --accent: #10B981;         /* Vibrant Emerald */
+            --accent-hover: #059669;
+            --accent-light: #d1fae5;
+            
+            --bg-main: #F8FAFC;        /* Soft Cool Gray/White */
+            --bg-card: #FFFFFF;
+            
+            --text-heading: #0F172A;
+            --text-body: #475569;
+            --text-light: #94A3B8;
+            
+            /* UI Elements */
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-pill: 50px;
+            
+            /* Shadows & Transitions */
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 30px -5px rgba(15, 76, 92, 0.08);
+            --shadow-lg: 0 20px 40px -10px rgba(16, 185, 129, 0.2);
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-body);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-heading);
+            line-height: 1.2;
+        }
+
+        /* --- Top Bar --- */
+        .top-bar {
+            background-color: var(--primary-dark);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px 5%;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .top-bar a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            margin-left: 24px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-bar a:hover {
+            color: var(--accent);
+        }
+
+        /* --- Official Header --- */
+        .official-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            height: 70px;
+            width: auto;
+            object-fit: contain;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        .ssus-logo {
+            border-radius: 50%;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+        }
+
+        .header-titles {
+            text-align: center;
+            flex: 1;
+            padding: 0 20px;
+        }
+
+        .header-titles h1 {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-titles h2 {
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* --- Navigation --- */
+        .navbar {
+            background-color: var(--bg-card);
+            display: flex;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar a {
+            padding: 18px 32px;
+            color: var(--text-heading);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .navbar a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background-color: var(--accent);
+            transition: var(--transition);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .navbar a:hover {
+            color: var(--accent);
+            background-color: rgba(16, 185, 129, 0.04);
+        }
+
+        .navbar a:hover::after {
+            width: 100%;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            position: relative;
+            height: 550px;
+            /* Added var(--primary) fallback color for slow connections before image loads */
+            background: var(--primary) url('https://lh3.googleusercontent.com/gps-cs-s/ANWiy9T8ZhW6IiiOjAIzSF9SmbC5o-LzrLnjf2WrcZ95IUzHZXx4y9oMbPpUXrSBoptC6U-Ktiw2PjnjJZLWr5SgMmeJKxkrvn3f0YFqbWZ0jshBt_IbWa_hfuVEQ7zAWY3bKKkaLBtEvy8y4x0=s1360-w1360-h1020-rw') center/cover no-repeat fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #ffffff;
+            padding: 0 20px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(15, 76, 92, 0.92) 0%, rgba(16, 185, 129, 0.75) 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-content h2 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: #ffffff;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            letter-spacing: -1px;
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 40px auto;
+            color: rgba(255,255,255,0.9);
+            font-weight: 300;
+        }
+
+        /* --- Main Layout & Shared Styles --- */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .section-header h2 {
+            font-size: 38px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 20px;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: var(--radius-pill);
+        }
+
+        /* --- About Section --- */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about-text {
+            background: var(--bg-card);
+            padding: 50px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-text::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--accent));
+        }
+
+        .about-text h3 {
+            color: var(--primary);
+            margin-bottom: 24px;
+            font-size: 26px;
+        }
+
+        .about-text p {
+            margin-bottom: 20px;
+            text-align: justify;
+            font-size: 16px;
+        }
+
+        .map-card {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .map-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .map-image {
+            width: 100%;
+            height: auto;
+            border-radius: var(--radius-md);
+            object-fit: cover;
+        }
+
+        /* --- Panchayat Details (Separate Interfaces) --- */
+        .details-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .detail-panel {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            background: var(--bg-card);
+            padding: 50px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .detail-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(16, 185, 129, 0.1);
+        }
+
+        .detail-panel.reverse {
+            flex-direction: row-reverse;
+        }
+
+        .detail-icon-container {
+            flex: 0 0 140px;
+            height: 140px;
+            background: linear-gradient(135deg, var(--bg-main), var(--accent-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 55px;
+            color: var(--primary);
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .detail-icon-container::after {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border: 2px dashed var(--accent);
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        .detail-content {
+            flex: 1;
+        }
+
+        .detail-content h3 {
+            font-size: 28px;
+            margin-bottom: 16px;
+            color: var(--primary);
+            display: inline-block;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 4px;
+        }
+
+        .detail-content p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-body);
+            text-align: justify;
+        }
+
+        /* --- Embedded GIS Map Section --- */
+        .gis-embedded-section {
+            background: var(--primary);
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .gis-embedded-section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.5;
+        }
+
+        .gis-header-container {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+            padding: 0 20px;
+        }
+
+        .gis-header-container h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .gis-header-container p {
+            font-size: 18px;
+            color: rgba(255,255,255,0.8);
+            font-weight: 300;
+        }
+
+        .map-interface-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: var(--transition);
+        }
+        
+        .map-interface-wrapper:hover {
+            border-color: rgba(16, 185, 129, 0.4);
+            box-shadow: 0 30px 60px -12px rgba(16, 185, 129, 0.3);
+        }
+
+        .map-interface-wrapper iframe {
+            width: 100%;
+            height: 700px;
+            border: none;
+            border-radius: var(--radius-md);
+            background-color: #ffffff;
+            display: block;
+        }
+
+        /* --- Map Click Overlay --- */
+        .map-click-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .map-click-overlay:hover {
+            background: rgba(15, 76, 92, 0.4);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+        .overlay-text {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            background: var(--accent);
+            padding: 16px 32px;
+            border-radius: var(--radius-pill);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .map-click-overlay:hover .overlay-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 18px 40px;
+            border-radius: var(--radius-pill);
+            font-size: 16px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #0ca372);
+            color: #ffffff;
+            box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px -5px rgba(16, 185, 129, 0.6);
+            color: #ffffff;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: #061e24;
+            color: rgba(255,255,255,0.7);
+            padding: 80px 5% 30px 5%;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 60px;
+            margin-bottom: 60px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer-col h3 {
+            color: #ffffff;
+            margin-bottom: 30px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .footer-col p {
+            margin-bottom: 20px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 16px;
+        }
+
+        .footer-col a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .footer-col a:hover {
+            color: var(--accent);
+            transform: translateX(6px);
+        }
+
+        .footer-col i {
+            color: var(--accent);
+            width: 20px;
+            text-align: center;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 992px) {
+            .about-grid { grid-template-columns: 1fr; }
+            .header-titles h1 { font-size: 24px; }
+            .hero { height: 450px; }
+            .hero-content h2 { font-size: 38px; }
+            .map-interface-wrapper iframe { height: 500px; }
+            
+            .detail-panel, .detail-panel.reverse {
+                flex-direction: column;
+                text-align: center;
+                padding: 40px 25px;
+                gap: 30px;
+            }
+            .detail-content p {
+                text-align: left;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar { flex-direction: column; gap: 12px; padding: 15px; }
+            .top-bar a { margin: 0 10px; }
+            .official-header { flex-direction: column; text-align: center; gap: 20px; padding: 25px 5%;}
+            .navbar { display: none; }
+            .gis-header-container h2 { font-size: 32px; }
+            .about-text { padding: 30px; }
+            .map-interface-wrapper iframe { height: 450px; }
+            .map-interface-wrapper { padding: 8px; border-radius: var(--radius-md); }
+            .map-click-overlay { top: 8px; left: 8px; right: 8px; bottom: 8px; }
+            .overlay-text { font-size: 16px; padding: 12px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Info Bar -->
+    <div class="top-bar">
+        <div>
+            <i class="fas fa-envelope" style="color: var(--accent);"></i> smrithysatheesh15@gmail.com
+        </div>
+        <div>
+            <!-- Links can go here -->
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="official-header">
+        <!-- Explicit height/width and eager load added to critical header logos to prevent layout shifts -->
+        <img src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcQKjxF49tPJ-wP4FfxGcdjN5pFDCV28p9y-Yui-yRVQFnP1_hAriF8mienBEiMxSUrbiZWZ80wqsb4HtaQ" 
+             alt="SSUS Logo" class="logo ssus-logo" width="70" height="70" loading="eager" decoding="async">
+        
+        <div class="header-titles">
+            <h1>Polpully Grama Panchayat</h1>
+            <h2>Spatial Information System (WebGIS)</h2>
+        </div>
+
+        <img src="https://lsgkerala.gov.in/system/files/inline-images/unified-lsgd-logo.png" 
+             alt="LSGD Kerala Logo" class="logo" width="70" height="70" loading="eager" decoding="async">
+    </header>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="#home"><i class="fas fa-home"></i> Home</a>
+        <a href="#about"><i class="fas fa-info-circle"></i> Panchayat Profile</a>
+        <a href="#details"><i class="fas fa-chart-pie"></i> Local Insights</a>
+        <a href="#webgis"><i class="fas fa-layer-group"></i> Interactive Map</a>
+        <a href="#contact"><i class="fas fa-address-book"></i> Contact</a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h2>Polpully WebGIS Portal</h2>
+            <p>A collaborative initiative by Sree Sankaracharya University of Sanskrit (Dept. of Geography) mapping the resources and infrastructure of Polpully Grama Panchayat.</p>
+            <a href="#webgis" class="btn btn-primary">
+                Explore Map Data <i class="fas fa-arrow-down"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="container">
+        <div class="section-header">
+            <h2>Panchayat Profile</h2>
+        </div>
+        
+        <div class="about-grid">
+            <div class="about-text">
+                <h3>Overview</h3>
+                <p>
+                    <strong>Polpully Grama Panchayat</strong> is a rural local self-government body located in the Palakkad district of Kerala, India. Positioned in the agrarian heartland near Chittur, this vibrant panchayat falls under the Chittur Assembly constituency and the Alathur Lok Sabha constituency.
+                </p>
+                <p>
+                    The Panchayat is responsible for providing essential civic services, maintaining local infrastructure, supporting sanitation and waste management, and implementing various government development programmes tailored to an agriculture-dependent community.
+                </p>
+                <p>
+                    Its geographical location, settlement pattern, transportation network, drainage, land use, and natural resources make it an important area for resource mapping and local-level planning. The present WebGIS project provides a comprehensive geographical overview of the region's essential resources.
+                </p>
+            </div>
+            
+            <div class="map-card">
+                <!-- Lazy loading and async decoding applied below the fold -->
+                <img 
+                    src="https://lh3.googleusercontent.com/gps-cs-s/ANWiy9RqzM_xCyalCbCh5xfy8y6LzitlcDaChwNNitmBKwTwUUPWwV-Sj_ZvF26Mt6EGcSXJpQ93wWnVo_FvkfqV7-XshE7doXD-x6Uoh89_bPfWvQvdAVwIMu4MoqP3pwcOmarmWovT=s1360-w1360-h1020-rw" 
+                    alt="Map of POLPULLY Grama Panchayat" 
+                    class="map-image"
+                    loading="lazy" 
+                    decoding="async"
+                    width="600"
+                    height="450"
+                    onerror="this.src='https://via.placeholder.com/600x450?text=Location+Map+Unavailable'"
+                >
+            </div>
+        </div>
+    </section>
+
+    <section id="details" class="container" style="padding-top: 0;">
+        <div class="section-header">
+            <h2>Local Insights</h2>
+        </div>
+        
+        <div class="details-stack">
+            <!-- Interface 1: Geography -->
+            <div class="detail-panel">
+                <div class="detail-icon-container">
+                    <i class="fas fa-mountain"></i>
+                </div>
+                <div class="detail-content">
+                    <h3>Geography</h3>
+                    <p>
+                        Polpully is located in the Chittur Taluk of Palakkad district. Influenced heavily by the Palakkad Gap in the Western Ghats, the terrain is characterized by extensive paddy fields, expansive coconut groves, and a distinct tropical wet-and-dry climate. The region's agrarian landscape is fundamentally supported by a network of local canals and natural drainage systems that serve as the lifeline for agricultural activities throughout the year.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Interface 2: Demography -->
+            <div class="detail-panel reverse">
+                <div class="detail-icon-container">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="detail-content">
+                    <h3>Demography</h3>
+                    <p>
+                        With a predominantly rural majority, Polpully is home to a diverse populace whose lives are deeply tied to agriculture and allied sectors. Malayalam is the primary language spoken, though its geographical proximity to the Tamil Nadu border means Tamil is also widely understood and spoken. The panchayat proudly reflects Kerala's universally recognized high standards in essential social metrics, including excellent literacy rates, a favorable sex ratio, and robust primary healthcare accessibility.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Interface 3: History -->
+            <div class="detail-panel">
+                <div class="detail-icon-container">
+                    <i class="fas fa-landmark"></i>
+                </div>
+                <div class="detail-content">
+                    <h3>History</h3>
+                    <p>
+                        Historically functioning as part of the erstwhile Palakkad Kingdom and subsequently absorbed into the Malabar District under the British Madras Presidency, Polpully has always stood as an important agrarian hinterland. The region transitioned into an independent, self-governing Grama Panchayat following the strong decentralization movements that swept through Kerala post-Indian independence, empowering the local community to map and manage their own development.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Embedded WebGIS Interface Section -->
+    <section id="webgis" class="gis-embedded-section">
+        <div class="gis-header-container">
+            <h2><i class="fas fa-globe-asia" style="color: var(--accent); margin-right: 12px;"></i> Interactive Spatial Viewer</h2>
+            <p>Pan, zoom, and toggle custom layers directly within the portal to view administrative boundaries, land utilization, and vital infrastructure in high resolution.</p>
+        </div>
+        
+        <div class="map-interface-wrapper">
+            <a href="https://smrithy05.github.io/test1/" target="_blank" rel="noopener noreferrer" class="map-click-overlay" title="Click to view map in full screen">
+                <span class="overlay-text"><i class="fas fa-expand-arrows-alt"></i> Open Full Screen Map</span>
+            </a>
+            
+            <iframe 
+                src="https://smrithy05.github.io/test1/" 
+                title="Polpully WebGIS Interactive Map" 
+                allowfullscreen 
+                loading="lazy">
+            </iframe>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3>About WebGIS</h3>
+                <p>Developed as a state-of-the-art spatial information system to aid resource mapping, local-level planning, and efficient governance for Polpully Grama Panchayat.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#home"><i class="fas fa-chevron-right" style="font-size: 12px;"></i> Home</a></li>
+                    <li><a href="#about"><i class="fas fa-chevron-right" style="font-size: 12px;"></i> Panchayat Profile</a></li>
+                    <li><a href="#details"><i class="fas fa-chevron-right" style="font-size: 12px;"></i> Local Insights</a></li>
+                    <li><a href="#webgis"><i class="fas fa-chevron-right" style="font-size: 12px;"></i> Spatial Viewer</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Project Contact</h3>
+                <ul>
+                    <li>
+                        <a href="#" style="pointer-events: none;">
+                            <i class="fas fa-user"></i> <strong>Smrithy K S</strong>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" style="pointer-events: none;">
+                            <i class="fas fa-graduation-cap"></i> Dept. of Geography, SSUS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="mailto:smrithysatheesh15@gmail.com">
+                            <i class="fas fa-envelope"></i> smrithysatheesh15@gmail.com
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 Polpully Grama Panchayat WebGIS. All rights reserved.</p>
+        </div>
+    </footer>
+    
+</body>
+</html>
